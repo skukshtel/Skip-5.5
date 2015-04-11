@@ -9,7 +9,14 @@ package org.usfirst.frc3467;
 
 import java.util.Vector;
 
+
+
+
+
+
 import org.usfirst.frc3467.commands.CommandBase;
+import org.usfirst.frc3467.commands.autonomous.AutoCanGrabbersDrive;
+import org.usfirst.frc3467.commands.autonomous.AutoCanGrabbersStayPut;
 import org.usfirst.frc3467.commands.autonomous.AutoNon;
 import org.usfirst.frc3467.commands.autonomous.AutoTimedTank;
 import org.usfirst.frc3467.subsystems.Elevator.commands.elevatorDriveToFloor;
@@ -48,15 +55,14 @@ public class Robot extends IterativeRobot {
 	public void robotInit() {
 
 		// Init camera and start camera server instance
-        cServer = CameraServer.getInstance();
+     /*   cServer = CameraServer.getInstance();
         cServer.setQuality(50);
         cServer.setSize(1);
         //the camera name (ex "cam0") can be found through the roborio web interface
         cServer.startAutomaticCapture("cam0");
-        
+     */
         lidar = new LIDAR(Port.kMXP);
         lidar.start();
-		
         // Initialize all subsystems
 		CommandBase.init();
 		
@@ -64,13 +70,16 @@ public class Robot extends IterativeRobot {
 		autoChooser = new SendableChooser();
 		autoChooser.addDefault("Default Auto", new AutoNon());
 		autoChooser.addObject("Timed Tank", new AutoTimedTank());
+		autoChooser.addObject("Can Grabber Auto - Move Right Side Only", new AutoCanGrabbersDrive());
+		autoChooser.addObject("Can Grabber Auto - No Moving", new AutoCanGrabbersStayPut());
 		
 		SmartDashboard.putData("Auto", autoChooser);
-
+		SmartDashboard.putNumber("Scoring Platform Height: Default 150", 150);
 	}
 	
 	public void autonomousInit() {
 		
+		CommandBase.imu.getGyroOffset();
 		// Reset all PID controllers
 		for (int i = 0; i < PIDList.size(); i++) {
 			PIDController controller = (PIDController) PIDList.elementAt(i);
@@ -103,9 +112,7 @@ public class Robot extends IterativeRobot {
 			controller.reset();
 			controller.enable();
 		}
-		if (CommandBase.leds != null) {
-			CommandBase.leds.setState("Teleop init", LEDs.REG3, 0);
-		}
+		
 		
 		if (CommandBase.elevator != null) {
 			// If elevator has not been zeroed, queue up a command to do it now
@@ -113,13 +120,18 @@ public class Robot extends IterativeRobot {
 				Scheduler.getInstance().add(new elevatorDriveToFloor());
 			}
 		}
+
+		
 	}
 	
 	public void disabledInit() {
-		if (CommandBase.leds != null) {
-			CommandBase.leds.setState("Disabled init", LEDs.REG3, 1);
+
 		}
 		
+
+	
+	public void disabledPeriodic(){
+		CommandBase.imu.setGyroOffset(SmartDashboard.getNumber("Match START Gyro Offset"));
 	}
 	
 	/**

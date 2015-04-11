@@ -5,12 +5,14 @@ import java.util.Vector;
 import org.usfirst.frc3467.OI;
 import org.usfirst.frc3467.Robot;
 import org.usfirst.frc3467.subsystems.DriveBase.DriveBase;
+import org.usfirst.frc3467.subsystems.Elevator.CanGrabbers;
 import org.usfirst.frc3467.subsystems.Elevator.Conveyor;
 import org.usfirst.frc3467.subsystems.Elevator.Elevator;
 import org.usfirst.frc3467.subsystems.Elevator.Indexer;
 import org.usfirst.frc3467.subsystems.LEDs.LEDs;
 import org.usfirst.frc3467.subsystems.LIDAR.LIDAR;
 import org.usfirst.frc3467.subsystems.MXP.MXP_IMU;
+import org.usfirst.frc3467.subsystems.Power.PowerMgr;
 
 import edu.wpi.first.wpilibj.I2C.Port;
 import edu.wpi.first.wpilibj.PIDController;
@@ -25,9 +27,11 @@ public abstract class CommandBase extends Command {
 	public static Elevator elevator;
 	public static Indexer indexer;
 	public static Conveyor conveyor;
+	public static CanGrabbers cangrabbers;
 	public static LEDs leds;
 	public static MXP_IMU imu;
 	public static LIDAR lidar;
+	public static PowerMgr pdp;
 	
 	public static Vector<Subsystem> subsystemList;
 	
@@ -47,6 +51,12 @@ public abstract class CommandBase extends Command {
 		
 		conveyor = new Conveyor();
 		subsystemList.addElement(conveyor);
+		
+		cangrabbers = new CanGrabbers();
+		subsystemList.addElement(cangrabbers);
+		
+		pdp = new PowerMgr();
+		subsystemList.addElement(pdp);
 		
 //		leds = new LEDs(); 
 //		subsystemList.addElement(leds);
